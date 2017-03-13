@@ -17,7 +17,7 @@ iptables-save > /etc/iptables.rules
 minionfile=/etc/salt/minion
 if [ -e $minionfile ]
 then
-	sed -e -i 's/#master: salt/master: salt.tchpc.tcd.ie/' /etc/salt/minion
+	sed -i 's/#master: salt/master: salt.tchpc.tcd.ie/' /etc/salt/minion
 elif [ ! -e $minionfile ]
 then
 	echo "master: $saltmaster" > $minionfile
