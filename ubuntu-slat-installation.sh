@@ -5,8 +5,8 @@
 apt-get install salt-minion -y
 
 # firewall
-saltmaster="salt.tchpc.tcd.ie"
-saltmasterip="134.226.112.44"
+saltmaster=""
+saltmasterip=""
 iptables -I INPUT -s $saltmasterip -m state --state new -m tcp -p tcp --dport 4505 -j ACCEPT
 iptables -I INPUT -s $saltmasterip -m state --state new -m tcp -p tcp --dport 4506 -j ACCEPT
 iptables-save > /etc/iptables.rules
