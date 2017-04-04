@@ -29,13 +29,14 @@ yum-cron apply:
     - pattern: "apply_updates = no"
     - repl: "apply_updates = yes"
 
+# I'm not sure if the /etc/yum/yum-cron-hourly.conf also needs to be updated but to be safe am doing so
+
 yum-cron-hourly command:
   file:
     - replace
     - name: /etc/yum/yum-cron-hourly.conf
-    - pattern: "update_cmd = default"
+    - pattern: "update_cmd = minimal"
     - repl: "update_cmd = security"
-
 yum-cron-hourly messages:
   file:
     - replace
@@ -65,6 +66,5 @@ enable yum-cron service:
     - watch:
       - file: /etc/yum/yum-cron.conf
       - file: /etc/yum/yum-cron-hourly.conf
-
 
 {% endif %}
