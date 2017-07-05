@@ -124,3 +124,26 @@ install packages that we want on every computer:
       - screen
 ```
 
+Install specific versions on specific node by editing pillar variables. Set the pillar to the updated versions for your test node:
+```
+# testing upgraded versions on specific nodes:
+{% if salt['grains.get']('id')[0:11]=='kelvin-n038' %}
+gpfs_version: 3.5.0-32
+{% else %}
+gpfs_version: 3.5.0-29
+{% endif %}
+{% if salt['grains.get']('id')[0:11]=='kelvin-n038' %}
+kernel_version: 2.6.32-642.3.1.el6.x86_64
+{% else %}
+kernel_version: 2.6.32-573.12.1.el6.x86_64
+{% endif %}
+```
+
+Install the relevant kernel version, (pillar variable) for the node, (identified by grain):
+```
+{% if grains['kernelrelease'] != salt['pillar.get']('kernel_version') %}
+install kernel packages (cmd):
+  cmd:
+    - run
+    - name: yum -y install kernel-headers-{{ salt['pillar.get']('kernel_version') }} kernel-{{ salt['pillar.get']('kernel_version') }} kernel-devel-{{ salt['pillar.get']('kernel_version') }}
+```
