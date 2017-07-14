@@ -147,3 +147,25 @@ install kernel packages (cmd):
     - run
     - name: yum -y install kernel-headers-{{ salt['pillar.get']('kernel_version') }} kernel-{{ salt['pillar.get']('kernel_version') }} kernel-devel-{{ salt['pillar.get']('kernel_version') }}
 ```
+
+# Checking updates available through yum
+- quick way to find out what security patches are needed on a host
+- only tested on Scientific Linux 6 so far
+- source https://github.com/mludvig/nagios-plugins/blob/master/check-yum-update.pl
+- run it from the comand line: `check-yum-update.pl --run-yum`
+- use a simple managed file to distribute to minions
+```
+/usr/local/bin/check-yum-update.pl:
+  file:
+    - managed
+    - mode: 700
+    - source: salt://tchpc-general/check_updates/check-yum-update.pl
+```
+- can determine the outstanding patches on hosts then
+```
+# salt server.fqdn cmd.run '/usr/local/bin/check-yum-update.pl --run-yum'
+server.fqdn:
+    WARNING - 3 updates available: kernel kernel-firmware kernel-headers
+ERROR: Minions returned with non-zero exit code
+```
+
