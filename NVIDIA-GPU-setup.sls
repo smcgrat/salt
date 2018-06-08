@@ -1,7 +1,10 @@
-# setup NVIDIA GK110BGL [Tesla K40m] on Boole GPU nodes
+# setup NVIDIA GPU's
 
 # ensure this state only runs on a node with the gpu installed in it
-{% if salt['grains.get']('gpus:model') == 'GK110BGL [Tesla K40m]' %}
+# used to be with this if salt['grains.get']('gpus:model') == 'GK110BGL [Tesla K40m]' 
+# but changing to a list as > 1 GPU card now
+{% set list_of_gpu_cards = [ 'GK110BGL [Tesla K40m]', 'Integrated Matrox G200eW3 Graphics Controller' ] %}
+{% if salt['grains.get']('gpus:model') in list_of_gpu_cards %}
 
 ensure base packages are installed:
   pkg:
@@ -67,26 +70,29 @@ stops after ramdisk reboot:
 
 {% endif %} # ramdisk regeneration ends
 
-{% if grains.get('nvidia_drivers_version') != '9.1.85' %}
-# old version was 9.0.176
+{% if grains.get('nvidia_drivers_version') != '9.2.88.1' %}
+# old version was 9.1.85
+# older version was 9.0.176
 
 Remove old drivers if installed:
   cmd.run:
     - name: /usr/bin/nvidia-uninstall --silent
     - unless: test ! -e /usr/bin/nvidia-uninstall
 
-Install CUDA 9.0.176:
+Install CUDA:
   cmd.run:
 #    - name: /home/support/root/gpu/cuda_9.0.176_384.81_linux-run --silent # Oct 2017 updated version
-    - name: /home/support/root/gpu/cuda_9.1.85_387.26_linux.run --silent # Jan 2018 updated version
+#    - name: /home/support/root/gpu/cuda_9.1.85_387.26_linux.run --silent # Jan 2018 updated version
+    - name: /home/support/root/gpu/cuda_9.2.88_396.26_linux --silent # Jun 2018 updated version
 
 ## following being retired in favour of the above
 #Install CUDA 8.0.61:
 #  cmd.run:
 #    - name: /home/support/root/gpu/cuda_8.0.61_375.26_linux.run --silent # July 2017 updated version
    
-#Patch CUDA to 8.0.61.2:
-#  cmd.run:
+Patch CUDA to 9.2.88.1:
+  cmd.run:
+    - name: /home/support/root/gpu/cuda_9.2.88.1_linux --silent --accept-eula
 #    - name: /home/support/root/gpu/cuda_8.0.61.2_linux.run --silent --accept-eula
 
 {% if pillar['reboot'] != 'yes' %}
@@ -114,7 +120,8 @@ nvidia_drivers_version:
   module.run:
     - name: grains.setval
     - key: nvidia_drivers_version
-    - val: '9.1.85'
+    - val: '9.2.88.1'
+#    - val: '9.1.85'
 #    - val: '9.0.176'
 
 {% endif %} # ends driver install
